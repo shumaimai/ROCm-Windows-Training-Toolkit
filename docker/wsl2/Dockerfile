@@ -48,7 +48,8 @@ RUN curl -fsSL -o /tmp/rocdxg.deb \
 
 WORKDIR /workspace
 COPY . /workspace
-RUN chmod +x /workspace/docker/wsl2/entrypoint.sh
+RUN sed -i 's/\r$//' /workspace/docker/wsl2/entrypoint.sh && \
+    chmod +x /workspace/docker/wsl2/entrypoint.sh
 
 ENTRYPOINT ["/workspace/docker/wsl2/entrypoint.sh"]
 CMD ["validate"]

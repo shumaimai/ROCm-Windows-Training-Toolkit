@@ -26,6 +26,12 @@ jobs:
       - name: Check Linux entrypoints
         if: runner.os == 'Linux'
         run: |
+          if grep -r $'\r' docker --include='*.sh'; then
+            echo "CRLF detected in a Linux entrypoint"
+            exit 1
+          fi
+          head -n 1 docker/wsl2/entrypoint.sh | grep -qx '#!/usr/bin/env bash'
+          head -n 1 docker/linux/entrypoint.sh | grep -qx '#!/usr/bin/env bash'
           bash -n docker/wsl2/entrypoint.sh
           bash -n docker/linux/entrypoint.sh
       - name: Validate required files

@@ -32,7 +32,8 @@ RUN python3.12 -m venv /opt/venv && \
 
 WORKDIR /workspace
 COPY . /workspace
-RUN chmod +x /workspace/docker/linux/entrypoint.sh
+RUN sed -i 's/\r$//' /workspace/docker/linux/entrypoint.sh && \
+    chmod +x /workspace/docker/linux/entrypoint.sh
 
 ENTRYPOINT ["/workspace/docker/linux/entrypoint.sh"]
 CMD ["validate"]

@@ -24,15 +24,18 @@ $Drive = $Matches[1].ToLowerInvariant()
 $Tail = $Matches[2].Replace('\', '/')
 $LinuxRoot = "/mnt/$Drive/$Tail"
 
-$Preflight = @"
-set -e
-test -c /dev/dxg
-test -f /usr/lib/wsl/lib/libdxcore.so
-test -S /var/run/docker.sock
-docker info >/dev/null
-"@
-wsl -d $Distro -u $User -- bash -lc $Preflight
-if ($LASTEXITCODE -ne 0) { throw "WSL2/Docker/DXG preflight failed." }
+$PreflightCommands = @(
+    @("test", "-c", "/dev/dxg"),
+    @("test", "-f", "/usr/lib/wsl/lib/libdxcore.so"),
+    @("test", "-S", "/var/run/docker.sock"),
+    @("docker", "info")
+)
+foreach ($Command in $PreflightCommands) {
+    wsl -d $Distro -u $User -- @Command 1>$null
+    if ($LASTEXITCODE -ne 0) {
+        throw "WSL2/Docker/DXG preflight failed: $($Command -join ' ')"
+    }
+}
 
 $DockerArguments = switch ($Action) {
     "build" { @("compose", "-f", "docker/compose.wsl2.yml", "build") }
