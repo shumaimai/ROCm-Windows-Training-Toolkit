@@ -1,0 +1,20 @@
+name: Radeon self-hosted kernel validation
+
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  validate:
+    runs-on: [self-hosted, windows, rocm, radeon]
+    timeout-minutes: 45
+    steps:
+      - uses: actions/checkout@v4
+      - name: Build
+        shell: pwsh
+        run: .\scripts\build.ps1
+      - name: Test synthetic kernels
+        shell: pwsh
+        run: .\scripts\test.ps1
