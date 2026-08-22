@@ -2,6 +2,27 @@ name: Radeon self-hosted kernel validation
 
 on:
   workflow_dispatch:
+    inputs:
+      platform:
+        description: Validation platform
+        required: true
+        type: choice
+        options:
+          - windows-native
+          - wsl2-docker
+        default: windows-native
+      distro:
+        description: WSL distribution for wsl2-docker
+        required: false
+        default: Ubuntu-24.04
+      user:
+        description: WSL user for wsl2-docker
+        required: false
+        default: shuhei
+      gpu_arch:
+        description: GPU architecture
+        required: true
+        default: gfx1101
 
 permissions:
   contents: read
@@ -12,9 +33,18 @@ jobs:
     timeout-minutes: 45
     steps:
       - uses: actions/checkout@v4
-      - name: Build
+      - name: Build Windows native
+        if: inputs.platform == 'windows-native'
         shell: pwsh
         run: .\scripts\build.ps1
-      - name: Test synthetic kernels
+      - name: Test Windows native
+        if: inputs.platform == 'windows-native'
         shell: pwsh
         run: .\scripts\test.ps1
+      - name: Test WSL2 Docker
+        if: inputs.platform == 'wsl2-docker'
+        shell: pwsh
+        run: |
+          .\scripts\wsl2-docker.ps1 -Action validate `
+            -Distro '${{ inputs.distro }}' -User '${{ inputs.user }}' `
+            -GpuArch '${{ inputs.gpu_arch }}'

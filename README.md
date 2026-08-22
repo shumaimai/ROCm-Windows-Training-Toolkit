@@ -43,6 +43,26 @@ The build identity hashes the C++/HIP sources, PyTorch version, HIP version,
 and detected GPU architecture. Generated `.pyd`, `.obj`, `.lib`, and build
 directories are ignored and are not distributed.
 
+Platform guides:
+
+- [Windows native](platforms/windows-native/README.md) - primary validated path
+- [WSL2 Docker](platforms/wsl2-docker/README.md) - Linux ABI via `/dev/dxg`
+- [Linux Docker](platforms/linux-docker/README.md) - native `/dev/kfd` and `/dev/dri`
+
+WSL2 Docker one-command validation:
+
+```powershell
+.\scripts\wsl2-docker.ps1 -Action validate
+```
+
+Validated WSL2 Docker stack:
+
+- Ubuntu 24.04 WSL2
+- `/dev/dxg` + Microsoft `libdxcore.so`
+- ROCDXG 1.2.2
+- ROCm 7.14 / PyTorch 2.12 Linux multi-arch wheels
+- Radeon RX 7800 XT (`gfx1101`)
+
 ## Python API
 
 ```python

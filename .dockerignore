@@ -1,0 +1,14 @@
+.git
+.github
+artifacts
+.venv*
+__pycache__
+*.pyc
+*.pyd
+*.so
+*.dll
+*.lib
+*.exp
+*.obj
+*.o
+*.log

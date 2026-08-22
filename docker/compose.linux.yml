@@ -1,0 +1,21 @@
+name: rocm-windows-training-linux
+
+services:
+  validate:
+    build:
+      context: ..
+      dockerfile: docker/linux/Dockerfile
+      args:
+        GPU_ARCH: ${GPU_ARCH:-gfx1101}
+        ROCM_VERSION: ${ROCM_VERSION:-7.14.0}
+        TORCH_VERSION: ${TORCH_VERSION:-2.12.0+rocm7.14.0}
+    image: rocm-windows-training-linux:${GPU_ARCH:-gfx1101}
+    devices:
+      - /dev/kfd:/dev/kfd
+      - /dev/dri:/dev/dri
+    group_add:
+      - video
+      - render
+    ipc: host
+    shm_size: 8gb
+    command: ["validate"]

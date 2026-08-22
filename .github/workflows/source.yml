@@ -23,10 +23,20 @@ jobs:
           python-version: "3.12"
       - name: Compile Python
         run: python -m compileall -q rocm_windows_training tests
+      - name: Check Linux entrypoints
+        if: runner.os == 'Linux'
+        run: |
+          bash -n docker/wsl2/entrypoint.sh
+          bash -n docker/linux/entrypoint.sh
       - name: Validate required files
         shell: pwsh
         run: |
-          foreach ($path in @('LICENSE','NOTICE','THIRD_PARTY.md','extensions/rocm_windows_kernels.cpp','extensions/rocm_windows_kernels.cu')) {
+          foreach ($path in @(
+            'LICENSE','NOTICE','THIRD_PARTY.md',
+            'extensions/rocm_windows_kernels.cpp','extensions/rocm_windows_kernels.cu',
+            'docker/wsl2/Dockerfile','docker/linux/Dockerfile',
+            'docker/compose.wsl2.yml','docker/compose.linux.yml'
+          )) {
             if (-not (Test-Path -LiteralPath $path)) { throw "Missing $path" }
           }
       - name: Parse PowerShell
