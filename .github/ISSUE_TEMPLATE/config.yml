@@ -1,0 +1,5 @@
+blank_issues_enabled: false
+contact_links:
+  - name: License and third-party notices
+    url: https://github.com/shumaimai/WaveTrain-Windows/blob/main/THIRD_PARTY.md
+    about: Review redistribution boundaries before attaching third-party artifacts.

@@ -1,0 +1,45 @@
+name: Radeon validation result
+description: Report WaveTrain build and test results from another AMD GPU
+title: "[Radeon validation] "
+labels: ["radeon-validation"]
+body:
+  - type: markdown
+    attributes:
+      value: "Do not attach API keys, model/checkpoint files, adapters, caches, or private data."
+  - type: input
+    id: gpu
+    attributes:
+      label: GPU and VRAM
+    validations:
+      required: true
+  - type: input
+    id: arch
+    attributes:
+      label: gcnArchName
+    validations:
+      required: true
+  - type: textarea
+    id: matrix
+    attributes:
+      label: OS, driver, Python, PyTorch, HIP/ROCm matrix
+    validations:
+      required: true
+  - type: input
+    id: identity
+    attributes:
+      label: Commit SHA and build identity
+    validations:
+      required: true
+  - type: textarea
+    id: results
+    attributes:
+      label: Commands and sanitized results
+    validations:
+      required: true
+  - type: checkboxes
+    id: privacy
+    attributes:
+      label: Publication safety
+      options:
+        - label: No credentials, generated binaries, model files, or private data are attached.
+          required: true

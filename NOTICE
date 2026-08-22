@@ -1,0 +1,22 @@
+WaveTrain Windows
+Copyright 2026 Shuhei
+
+This repository contains independently maintained HIP kernel and PyTorch
+extension code extracted from commit f2c6c9c of Mozc-Ai-Training and renamed
+to use the WaveTrain namespace. The extraction removed Mozc application code,
+training data, model code, model weights, tokenizers, checkpoints, adapters,
+and generated binaries.
+
+The mathematical recurrence is informed by the published Structured State
+Space Duality / Mamba-2 literature. No source code from the Mamba,
+causal-conv1d, or PLaMo distributions is included in this repository.
+
+This project is independently developed and is not affiliated with, sponsored
+by, or endorsed by Advanced Micro Devices, Inc., the PyTorch Foundation, The
+Linux Foundation, Preferred Networks, Inc., Preferred Elements, Inc., or the
+authors of Mamba.
+
+AMD and AMD ROCm are trademarks of Advanced Micro Devices, Inc. PyTorch is a
+trademark or registered trademark of The Linux Foundation in the United States
+and other countries. All other trademarks are the property of their respective
+owners.
