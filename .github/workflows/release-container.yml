@@ -1,0 +1,155 @@
+name: Publish WSL2 container
+
+on:
+  release:
+    types: [published]
+  workflow_dispatch:
+    inputs:
+      version:
+        description: Container version without v prefix
+        required: true
+        default: 0.1.0
+      gpu_arch:
+        description: GPU architecture
+        required: true
+        default: gfx1101
+
+concurrency:
+  group: container-${{ github.event.release.tag_name || inputs.version }}-${{ inputs.gpu_arch || 'gfx1101' }}
+  cancel-in-progress: false
+
+permissions:
+  contents: read
+  packages: write
+
+jobs:
+  publish:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 360
+    env:
+      REGISTRY: ghcr.io
+      IMAGE: ghcr.io/${{ github.repository_owner }}/rocm-windows-training-toolkit-wsl2
+      GPU_ARCH: ${{ inputs.gpu_arch || 'gfx1101' }}
+      VERSION: ${{ inputs.version || github.event.release.tag_name }}
+    outputs:
+      image: ${{ steps.names.outputs.image }}
+      version: ${{ steps.names.outputs.version }}
+      tag: ${{ steps.names.outputs.tag }}
+      digest: ${{ steps.build.outputs.digest }}
+      gpu_arch: ${{ env.GPU_ARCH }}
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Free hosted-runner disk
+        run: |
+          sudo rm -rf /usr/local/lib/android /usr/share/dotnet /opt/ghc /usr/local/.ghcup
+          docker system prune -af || true
+          df -h /
+
+      - name: Normalize metadata
+        id: names
+        shell: bash
+        run: |
+          version="${VERSION#v}"
+          image="${IMAGE,,}"
+          echo "version=${version}" >> "$GITHUB_OUTPUT"
+          echo "image=${image}" >> "$GITHUB_OUTPUT"
+          echo "tag=${version}-${GPU_ARCH}" >> "$GITHUB_OUTPUT"
+
+      - name: Log in to GHCR
+        uses: docker/login-action@v4
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Set up Buildx
+        uses: docker/setup-buildx-action@v4
+
+      - name: Build and push gfx-targeted image
+        id: build
+        uses: docker/build-push-action@v7
+        with:
+          context: .
+          file: docker/wsl2/Dockerfile
+          platforms: linux/amd64
+          push: true
+          build-args: |
+            GPU_ARCH=${{ env.GPU_ARCH }}
+          tags: |
+            ${{ steps.names.outputs.image }}:${{ steps.names.outputs.tag }}
+            ${{ steps.names.outputs.image }}:${{ env.GPU_ARCH }}
+            ${{ steps.names.outputs.image }}:latest-${{ env.GPU_ARCH }}
+          labels: |
+            org.opencontainers.image.source=${{ github.server_url }}/${{ github.repository }}
+            org.opencontainers.image.revision=${{ github.sha }}
+            org.opencontainers.image.version=${{ steps.names.outputs.version }}
+            org.opencontainers.image.licenses=Apache-2.0
+          provenance: mode=min
+          sbom: true
+
+      - name: Write release metadata
+        shell: bash
+        run: |
+          mkdir -p release-metadata
+          cat > release-metadata/container.json <<EOF
+          {
+            "image": "${{ steps.names.outputs.image }}",
+            "version_tag": "${{ steps.names.outputs.tag }}",
+            "gpu_arch": "${GPU_ARCH}",
+            "digest": "${{ steps.build.outputs.digest }}",
+            "source_commit": "${GITHUB_SHA}",
+            "rocm": "7.14.0",
+            "pytorch": "2.12.0+rocm7.14.0",
+            "rocdxg": "1.2.2"
+          }
+          EOF
+
+      - name: Upload small metadata artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: container-metadata-${{ steps.names.outputs.tag }}
+          path: release-metadata/container.json
+          retention-days: 30
+
+  release-notes:
+    if: github.event_name == 'release'
+    needs: publish
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - name: Add GHCR usage to release notes
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          TAG: ${{ github.event.release.tag_name }}
+          IMAGE: ${{ needs.publish.outputs.image }}
+          VERSION_TAG: ${{ needs.publish.outputs.tag }}
+          VERSION: ${{ needs.publish.outputs.version }}
+          GPU_ARCH: ${{ needs.publish.outputs.gpu_arch }}
+          DIGEST: ${{ needs.publish.outputs.digest }}
+        run: |
+          body=$(gh release view "$TAG" --repo "$GITHUB_REPOSITORY" --json body --jq '.body')
+          {
+            printf '%s\n\n' "$body"
+            cat <<EOF
+          ## WSL2 Docker image
+
+          Image: \\`${IMAGE}\\`
+
+          - Version: \\`${IMAGE}:${VERSION_TAG}\\`
+          - Architecture alias: \\`${IMAGE}:${GPU_ARCH}\\`
+          - Latest architecture alias: \\`${IMAGE}:latest-${GPU_ARCH}\\`
+          - Immutable digest: \\`${IMAGE}@${DIGEST}\\`
+
+          Pull and run from PowerShell:
+
+          \\`\\`\\`powershell
+          .\\scripts\\wsl2-docker.ps1 -Action release -ImageTag ${VERSION_TAG}
+          \\`\\`\\`
+
+          This image is source-linked, Apache-2.0 licensed, and published with
+          BuildKit provenance plus an OCI SBOM. It targets \\`${GPU_ARCH}\\`.
+          EOF
+          } > /tmp/release-notes.md
+          gh release edit "$TAG" --repo "$GITHUB_REPOSITORY" --notes-file /tmp/release-notes.md

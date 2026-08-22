@@ -1,5 +1,9 @@
 # Unofficial ROCm Windows Training Toolkit
 
+[![Source validation](https://github.com/shumaimai/ROCm-Windows-Training-Toolkit/actions/workflows/source.yml/badge.svg)](https://github.com/shumaimai/ROCm-Windows-Training-Toolkit/actions/workflows/source.yml)
+[![GHCR WSL2 image](https://img.shields.io/badge/GHCR-WSL2%20gfx1101-2496ED?logo=docker&logoColor=white)](https://github.com/shumaimai/ROCm-Windows-Training-Toolkit/pkgs/container/rocm-windows-training-toolkit-wsl2)
+[![Release](https://img.shields.io/github/v/release/shumaimai/ROCm-Windows-Training-Toolkit)](https://github.com/shumaimai/ROCm-Windows-Training-Toolkit/releases/latest)
+
 Independent HIP kernels and PyTorch extension tooling for native Windows AMD
 GPU training experiments. This is an unofficial source-only ROCm compatibility
 project; it is not an AMD, PyTorch, PFN, or Mamba distribution.
@@ -53,6 +57,18 @@ WSL2 Docker one-command validation:
 
 ```powershell
 .\scripts\wsl2-docker.ps1 -Action validate
+```
+
+Use the published GHCR image without building locally:
+
+```powershell
+.\scripts\wsl2-docker.ps1 -Action release -ImageTag latest-gfx1101
+```
+
+Container releases are published at:
+
+```text
+ghcr.io/shumaimai/rocm-windows-training-toolkit-wsl2:<version>-gfx1101
 ```
 
 Validated WSL2 Docker stack:

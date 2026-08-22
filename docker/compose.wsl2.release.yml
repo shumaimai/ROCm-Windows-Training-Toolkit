@@ -1,0 +1,18 @@
+name: rocm-windows-training-wsl2-release
+
+services:
+  validate:
+    image: ghcr.io/shumaimai/rocm-windows-training-toolkit-wsl2:${IMAGE_TAG:-latest-gfx1101}
+    devices:
+      - /dev/dxg:/dev/dxg
+    volumes:
+      - /usr/lib/wsl/lib/libdxcore.so:/usr/lib/libdxcore.so:ro
+    cap_add:
+      - SYS_PTRACE
+    security_opt:
+      - seccomp=unconfined
+    ipc: host
+    shm_size: 8gb
+    environment:
+      HSA_ENABLE_DXG_DETECTION: "1"
+    command: ["validate"]

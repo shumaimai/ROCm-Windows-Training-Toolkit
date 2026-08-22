@@ -1,9 +1,10 @@
 param(
-    [ValidateSet("validate", "build", "shell", "check")]
+    [ValidateSet("validate", "build", "shell", "check", "release")]
     [string]$Action = "validate",
     [string]$Distro = "Ubuntu-24.04",
     [string]$User = "",
-    [string]$GpuArch = "gfx1101"
+    [string]$GpuArch = "gfx1101",
+    [string]$ImageTag = "latest-gfx1101"
 )
 
 $ErrorActionPreference = "Stop"
@@ -41,7 +42,8 @@ $DockerArguments = switch ($Action) {
     "build" { @("compose", "-f", "docker/compose.wsl2.yml", "build") }
     "shell" { @("compose", "-f", "docker/compose.wsl2.yml", "run", "--rm", "validate", "shell") }
     "check" { @("compose", "-f", "docker/compose.wsl2.yml", "run", "--rm", "validate", "check") }
+    "release" { @("compose", "-f", "docker/compose.wsl2.release.yml", "run", "--rm", "--pull", "always", "validate") }
     default { @("compose", "-f", "docker/compose.wsl2.yml", "run", "--rm", "--build", "validate") }
 }
-wsl -d $Distro -u $User --cd $LinuxRoot -- env "GPU_ARCH=$GpuArch" docker @DockerArguments
+wsl -d $Distro -u $User --cd $LinuxRoot -- env "GPU_ARCH=$GpuArch" "IMAGE_TAG=$ImageTag" docker @DockerArguments
 if ($LASTEXITCODE -ne 0) { throw "WSL2 Docker action failed: $Action" }

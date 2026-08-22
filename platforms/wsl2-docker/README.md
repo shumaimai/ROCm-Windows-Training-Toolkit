@@ -40,3 +40,9 @@ Interactive shell:
 ```powershell
 .\scripts\wsl2-docker.ps1 -Action shell
 ```
+
+Use the released GHCR image without building:
+
+```powershell
+.\scripts\wsl2-docker.ps1 -Action release -ImageTag latest-gfx1101
+```
