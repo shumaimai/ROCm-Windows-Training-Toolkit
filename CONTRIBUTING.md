@@ -1,6 +1,6 @@
 # Contributing
 
-Thank you for helping validate and improve WaveTrain Windows.
+Thank you for helping validate and improve the unofficial ROCm Windows Training Toolkit.
 
 ## Ground rules
 

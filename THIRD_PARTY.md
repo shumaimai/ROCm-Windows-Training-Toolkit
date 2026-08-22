@@ -1,6 +1,6 @@
 # Third-party software
 
-WaveTrain Windows is source-only and does not vendor or redistribute the
+ROCm Windows Training Toolkit is source-only and does not vendor or redistribute the
 following dependencies. Users install them separately under their own
 licenses.
 

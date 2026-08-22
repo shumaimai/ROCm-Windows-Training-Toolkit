@@ -1,8 +1,8 @@
-# WaveTrain Windows
+# Unofficial ROCm Windows Training Toolkit
 
-Independent HIP kernels and a PyTorch extension loader for native Windows AMD
-GPU experiments. This is an unofficial source-only project; it is not an AMD,
-PyTorch, PFN, or Mamba distribution.
+Independent HIP kernels and PyTorch extension tooling for native Windows AMD
+GPU training experiments. This is an unofficial source-only ROCm compatibility
+project; it is not an AMD, PyTorch, PFN, or Mamba distribution.
 
 ## Scope
 
@@ -46,7 +46,7 @@ directories are ignored and are not distributed.
 ## Python API
 
 ```python
-from wavetrain.hip_extension import (
+from rocm_windows_training.hip_extension import (
     extension_info,
     make_autograd_function,
     make_conv_autograd_function,
@@ -69,7 +69,7 @@ See [GPU_MATRIX.md](GPU_MATRIX.md) for requested architectures and
 
 ## License and trademarks
 
-WaveTrain Windows is licensed under Apache-2.0. Runtime dependencies remain
+ROCm Windows Training Toolkit is licensed under Apache-2.0. Runtime dependencies remain
 under their respective licenses; see [THIRD_PARTY.md](THIRD_PARTY.md) and
 [NOTICE](NOTICE).
 

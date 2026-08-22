@@ -15,8 +15,8 @@ import torch
 
 ROOT = Path(__file__).resolve().parents[1]
 SOURCES = (
-    ROOT / "extensions" / "wavetrain_ssd.cpp",
-    ROOT / "extensions" / "wavetrain_ssd.cu",
+    ROOT / "extensions" / "rocm_windows_kernels.cpp",
+    ROOT / "extensions" / "rocm_windows_kernels.cu",
 )
 _loaded_info: dict[str, str] = {}
 
@@ -78,7 +78,7 @@ def load_extension():
     arch = _gpu_arch()
     rocm_root = _find_rocm_root()
     identity = _build_identity(arch)
-    module_name = f"wavetrain_hip_{identity}"
+    module_name = f"rocm_windows_training_{identity}"
     build_dir = ROOT / "artifacts" / "hip-extension" / identity
     build_dir.mkdir(parents=True, exist_ok=True)
     binary = build_dir / f"{module_name}.pyd"

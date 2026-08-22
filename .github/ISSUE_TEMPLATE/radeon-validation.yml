@@ -1,5 +1,5 @@
 name: Radeon validation result
-description: Report WaveTrain build and test results from another AMD GPU
+description: Report ROCm Windows Training build and test results from another AMD GPU
 title: "[Radeon validation] "
 labels: ["radeon-validation"]
 body:

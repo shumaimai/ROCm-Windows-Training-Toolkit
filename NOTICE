@@ -1,9 +1,9 @@
-WaveTrain Windows
+Unofficial ROCm Windows Training Toolkit
 Copyright 2026 Shuhei
 
 This repository contains independently maintained HIP kernel and PyTorch
 extension code extracted from commit f2c6c9c of Mozc-Ai-Training and renamed
-to use the WaveTrain namespace. The extraction removed Mozc application code,
+to use an independent ROCm Windows Training namespace. The extraction removed
 training data, model code, model weights, tokenizers, checkpoints, adapters,
 and generated binaries.
 

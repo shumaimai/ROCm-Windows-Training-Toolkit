@@ -41,7 +41,7 @@ TheRock package date and commit, and treat failures as development evidence.
 - Windows build and AMD driver
 - Python, PyTorch, HIP/ROCm versions
 - released ROCm or TheRock nightly channel/date
-- commit SHA and WaveTrain build identity
+- commit SHA and ROCm Windows Training build identity
 - build output and first failing synthetic test
 - confirmation that no private data, credentials, model files, checkpoints,
   adapters, or generated binaries are attached

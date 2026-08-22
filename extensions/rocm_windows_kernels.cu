@@ -20,7 +20,7 @@ __device__ __forceinline__ float stable_softplus(float value) {
 }
 
 template <typename scalar_t>
-__global__ void wavetrain_ssd_forward_kernel(
+__global__ void rocm_windows_ssd_forward_kernel(
     const scalar_t* x,
     const scalar_t* dt,
     const float* a,
@@ -85,7 +85,7 @@ __global__ void wavetrain_ssd_forward_kernel(
   }
 }
 
-std::vector<torch::Tensor> wavetrain_ssd_forward_hip(
+std::vector<torch::Tensor> rocm_windows_ssd_forward_hip(
     torch::Tensor x,
     torch::Tensor dt,
     torch::Tensor a,
@@ -117,10 +117,10 @@ std::vector<torch::Tensor> wavetrain_ssd_forward_hip(
       at::ScalarType::Half,
       at::ScalarType::BFloat16,
       x.scalar_type(),
-      "wavetrain_ssd_forward_hip",
+      "rocm_windows_ssd_forward_hip",
       [&] {
         hipLaunchKernelGGL(
-            HIP_KERNEL_NAME(wavetrain_ssd_forward_kernel<scalar_t>),
+            HIP_KERNEL_NAME(rocm_windows_ssd_forward_kernel<scalar_t>),
             dim3(blocks), dim3(threads), 0, stream,
             x.const_data_ptr<scalar_t>(),
             dt.const_data_ptr<scalar_t>(),
@@ -140,7 +140,7 @@ std::vector<torch::Tensor> wavetrain_ssd_forward_hip(
 }
 
 template <typename scalar_t>
-__global__ void wavetrain_ssd_backward_kernel(
+__global__ void rocm_windows_ssd_backward_kernel(
     const scalar_t* grad_output,
     const float* states,
     const scalar_t* x,
@@ -248,7 +248,7 @@ __global__ void wavetrain_ssd_backward_kernel(
   atomicAdd(&grad_dt_bias[head], local_bias);
 }
 
-std::vector<torch::Tensor> wavetrain_ssd_backward_hip(
+std::vector<torch::Tensor> rocm_windows_ssd_backward_hip(
     torch::Tensor grad_output, torch::Tensor states, torch::Tensor x,
     torch::Tensor dt, torch::Tensor a, torch::Tensor b, torch::Tensor c,
     torch::Tensor d, torch::Tensor z, torch::Tensor dt_bias,
@@ -272,9 +272,9 @@ std::vector<torch::Tensor> wavetrain_ssd_backward_hip(
   constexpr int chunk_size = 1;
   AT_DISPATCH_FLOATING_TYPES_AND2(
       at::ScalarType::Half, at::ScalarType::BFloat16, x.scalar_type(),
-      "wavetrain_ssd_backward_hip", [&] {
+      "rocm_windows_ssd_backward_hip", [&] {
         hipLaunchKernelGGL(
-            HIP_KERNEL_NAME(wavetrain_ssd_backward_kernel<scalar_t>),
+            HIP_KERNEL_NAME(rocm_windows_ssd_backward_kernel<scalar_t>),
             dim3(blocks), dim3(threads), 0, stream,
             grad_output.const_data_ptr<scalar_t>(), states.const_data_ptr<float>(),
             x.const_data_ptr<scalar_t>(), dt.const_data_ptr<scalar_t>(),
@@ -295,7 +295,7 @@ std::vector<torch::Tensor> wavetrain_ssd_backward_hip(
 }
 
 template <typename scalar_t>
-__global__ void wavetrain_conv_forward_kernel(
+__global__ void rocm_windows_conv_forward_kernel(
     const scalar_t* x, const scalar_t* weight, const int32_t* seq_idx,
     scalar_t* output, int batch, int channels, int length, int width,
     bool has_seq_idx) {
@@ -349,7 +349,7 @@ __device__ __forceinline__ float conv_raw_at(
 }
 
 template <typename scalar_t>
-__global__ void wavetrain_conv_grad_x_kernel(
+__global__ void rocm_windows_conv_grad_x_kernel(
     const scalar_t* grad_output, const scalar_t* x, const scalar_t* weight,
     const int32_t* seq_idx, scalar_t* grad_x,
     int batch, int channels, int length, int width, bool has_seq_idx) {
@@ -384,7 +384,7 @@ __global__ void wavetrain_conv_grad_x_kernel(
 }
 
 template <typename scalar_t>
-__global__ void wavetrain_conv_grad_weight_kernel(
+__global__ void rocm_windows_conv_grad_weight_kernel(
     const scalar_t* grad_output, const scalar_t* x, const scalar_t* weight,
     const int32_t* seq_idx, float* grad_weight,
     int batch, int channels, int length, int width, bool has_seq_idx) {
@@ -420,7 +420,7 @@ __global__ void wavetrain_conv_grad_weight_kernel(
   grad_weight[linear] = accumulated;
 }
 
-torch::Tensor wavetrain_conv_forward_hip(
+torch::Tensor rocm_windows_conv_forward_hip(
     torch::Tensor x, torch::Tensor weight, torch::Tensor seq_idx) {
   const c10::cuda::CUDAGuard guard(x.device());
   auto output = torch::empty_like(x);
@@ -432,8 +432,8 @@ torch::Tensor wavetrain_conv_forward_hip(
   const auto stream = at::cuda::getCurrentCUDAStream(x.device().index());
   AT_DISPATCH_FLOATING_TYPES_AND2(
       at::ScalarType::Half, at::ScalarType::BFloat16, x.scalar_type(),
-      "wavetrain_conv_forward_hip", [&] {
-        hipLaunchKernelGGL(HIP_KERNEL_NAME(wavetrain_conv_forward_kernel<scalar_t>),
+      "rocm_windows_conv_forward_hip", [&] {
+        hipLaunchKernelGGL(HIP_KERNEL_NAME(rocm_windows_conv_forward_kernel<scalar_t>),
             dim3(blocks), dim3(threads), 0, stream,
             x.const_data_ptr<scalar_t>(), weight.const_data_ptr<scalar_t>(),
             has_seq_idx ? seq_idx.const_data_ptr<int32_t>() : nullptr,
@@ -443,7 +443,7 @@ torch::Tensor wavetrain_conv_forward_hip(
   return output;
 }
 
-std::vector<torch::Tensor> wavetrain_conv_backward_hip(
+std::vector<torch::Tensor> rocm_windows_conv_backward_hip(
     torch::Tensor grad_output, torch::Tensor x, torch::Tensor weight,
     torch::Tensor seq_idx, bool need_weight_grad) {
   const c10::cuda::CUDAGuard guard(x.device());
@@ -457,8 +457,8 @@ std::vector<torch::Tensor> wavetrain_conv_backward_hip(
   const auto stream = at::cuda::getCurrentCUDAStream(x.device().index());
   AT_DISPATCH_FLOATING_TYPES_AND2(
       at::ScalarType::Half, at::ScalarType::BFloat16, x.scalar_type(),
-      "wavetrain_conv_backward_hip", [&] {
-        hipLaunchKernelGGL(HIP_KERNEL_NAME(wavetrain_conv_grad_x_kernel<scalar_t>),
+      "rocm_windows_conv_backward_hip", [&] {
+        hipLaunchKernelGGL(HIP_KERNEL_NAME(rocm_windows_conv_grad_x_kernel<scalar_t>),
             dim3(blocks), dim3(threads), 0, stream,
             grad_output.const_data_ptr<scalar_t>(), x.const_data_ptr<scalar_t>(),
             weight.const_data_ptr<scalar_t>(),
@@ -468,7 +468,7 @@ std::vector<torch::Tensor> wavetrain_conv_backward_hip(
         if (need_weight_grad) {
           const int weight_total = channels * width;
           const int weight_blocks = (weight_total + threads - 1) / threads;
-          hipLaunchKernelGGL(HIP_KERNEL_NAME(wavetrain_conv_grad_weight_kernel<scalar_t>),
+          hipLaunchKernelGGL(HIP_KERNEL_NAME(rocm_windows_conv_grad_weight_kernel<scalar_t>),
               dim3(weight_blocks), dim3(threads), 0, stream,
               grad_output.const_data_ptr<scalar_t>(), x.const_data_ptr<scalar_t>(),
               weight.const_data_ptr<scalar_t>(),

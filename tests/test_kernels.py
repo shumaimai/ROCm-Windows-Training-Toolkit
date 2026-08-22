@@ -3,7 +3,7 @@ from __future__ import annotations
 import torch
 import torch.nn.functional as functional
 
-from wavetrain.hip_extension import make_autograd_function, make_conv_autograd_function
+from rocm_windows_training.hip_extension import make_autograd_function, make_conv_autograd_function
 
 
 def reference_ssd(x, dt, a, b, c, d, z, bias, seq_idx):
@@ -114,7 +114,7 @@ def main() -> None:
     closed_form_low_precision(torch.float16)
     closed_form_low_precision(torch.bfloat16)
     torch.cuda.synchronize()
-    print("WaveTrain HIP kernel tests passed")
+    print("ROCm Windows Training HIP kernel tests passed")
 
 
 if __name__ == "__main__":

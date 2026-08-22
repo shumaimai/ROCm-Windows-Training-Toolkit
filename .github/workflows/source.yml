@@ -22,11 +22,11 @@ jobs:
         with:
           python-version: "3.12"
       - name: Compile Python
-        run: python -m compileall -q wavetrain tests
+        run: python -m compileall -q rocm_windows_training tests
       - name: Validate required files
         shell: pwsh
         run: |
-          foreach ($path in @('LICENSE','NOTICE','THIRD_PARTY.md','extensions/wavetrain_ssd.cpp','extensions/wavetrain_ssd.cu')) {
+          foreach ($path in @('LICENSE','NOTICE','THIRD_PARTY.md','extensions/rocm_windows_kernels.cpp','extensions/rocm_windows_kernels.cu')) {
             if (-not (Test-Path -LiteralPath $path)) { throw "Missing $path" }
           }
       - name: Parse PowerShell
