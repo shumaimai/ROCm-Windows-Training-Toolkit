@@ -64,6 +64,9 @@ Open the Radeon validation Issue form and include GPU model, VRAM,
 identity, and first failing command. Do not attach credentials, model files,
 checkpoints, adapters, or private data.
 
+See [GPU_MATRIX.md](GPU_MATRIX.md) for requested architectures and
+[CONTRIBUTING.md](CONTRIBUTING.md) before opening a pull request.
+
 ## License and trademarks
 
 WaveTrain Windows is licensed under Apache-2.0. Runtime dependencies remain
