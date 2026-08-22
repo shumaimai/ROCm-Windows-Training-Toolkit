@@ -19,7 +19,7 @@ report all versions.
 | gfx1100 | Radeon RX 7900 XTX | #4 |
 | gfx1102 | Radeon RX 7600 | #7 |
 | gfx1150 | Ryzen AI 9 HX 375 / Radeon 890M | #6 |
-| gfx1151 | Ryzen AI Max+ PRO 395 / Radeon 8060S | #7 |
+| gfx1151 | Ryzen AI Max+ PRO 395 / Radeon 8060S | #8 |
 | gfx1200 | Radeon RX 9060 XT | #5 |
 | gfx1201 | Radeon AI PRO R9700 or Radeon RX 9070 XT | #9 |
 
