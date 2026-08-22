@@ -18,7 +18,7 @@ on:
       user:
         description: WSL user for wsl2-docker
         required: false
-        default: shuhei
+        default: ""
       gpu_arch:
         description: GPU architecture
         required: true

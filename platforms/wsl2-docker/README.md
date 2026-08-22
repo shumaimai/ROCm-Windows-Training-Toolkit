@@ -15,8 +15,11 @@ One-command validation from PowerShell:
 
 ```powershell
 .\scripts\wsl2-docker.ps1 -Action validate -Distro Ubuntu-24.04 `
-  -User shuhei -GpuArch gfx1101
+  -GpuArch gfx1101
 ```
+
+The distro's default user is detected automatically. Pass `-User <name>` only
+when a different WSL account should run Docker.
 
 The image pins Ubuntu 24.04, ROCm 7.14, PyTorch 2.12, and ROCDXG 1.2.2. It
 installs ROCm/PyTorch through AMD's multi-architecture wheel repository and

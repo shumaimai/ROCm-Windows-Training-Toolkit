@@ -2,7 +2,7 @@ param(
     [ValidateSet("validate", "build", "shell", "check")]
     [string]$Action = "validate",
     [string]$Distro = "Ubuntu-24.04",
-    [string]$User = "shuhei",
+    [string]$User = "",
     [string]$GpuArch = "gfx1101"
 )
 
@@ -11,6 +11,10 @@ $Root = Split-Path -Parent $PSScriptRoot
 
 $Distros = (wsl --list --quiet) -replace "`0", "" | ForEach-Object { $_.Trim() }
 if ($Distro -notin $Distros) { throw "WSL distribution not found: $Distro" }
+if (-not $User) {
+    $User = (wsl -d $Distro -- id -un).Trim()
+    if (-not $User) { throw "Failed to detect the default user for $Distro." }
+}
 
 $ResolvedRoot = (Resolve-Path -LiteralPath $Root).Path
 if ($ResolvedRoot -notmatch '^([A-Za-z]):\\(.*)$') {
