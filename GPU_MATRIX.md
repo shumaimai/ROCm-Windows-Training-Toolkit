@@ -7,7 +7,11 @@ replace AMD's released ROCm compatibility matrix.
 
 | Architecture | Representative GPU | Status |
 |---|---|---|
-| gfx1101 | Radeon RX 7800 XT | Windows build and synthetic tests pass |
+| gfx1101 | Radeon RX 7800 XT | Windows native and WSL2 Docker synthetic tests pass |
+
+Validated WSL2 Docker stack: Ubuntu 24.04, `/dev/dxg`, ROCDXG 1.2.2,
+ROCm 7.14, PyTorch 2.12, Linux `.so` extension. Native Linux `/dev/kfd`
+container runtime remains untested on this machine.
 
 ## Requested release-validation targets
 
