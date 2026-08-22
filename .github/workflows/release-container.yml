@@ -129,27 +129,36 @@ jobs:
           GPU_ARCH: ${{ needs.publish.outputs.gpu_arch }}
           DIGEST: ${{ needs.publish.outputs.digest }}
         run: |
-          body=$(gh release view "$TAG" --repo "$GITHUB_REPOSITORY" --json body --jq '.body')
-          {
-            printf '%s\n\n' "$body"
-            cat <<EOF
+          gh release view "$TAG" --repo "$GITHUB_REPOSITORY" --json body --jq '.body' > /tmp/original.md
+          python - <<'PY'
+          import os
+          from pathlib import Path
+
+          original = Path("/tmp/original.md").read_text(encoding="utf-8").rstrip()
+          image = os.environ["IMAGE"]
+          version_tag = os.environ["VERSION_TAG"]
+          arch = os.environ["GPU_ARCH"]
+          digest = os.environ["DIGEST"]
+          metadata = f"""
+
           ## WSL2 Docker image
 
-          Image: \\`${IMAGE}\\`
+          Image: `{image}`
 
-          - Version: \\`${IMAGE}:${VERSION_TAG}\\`
-          - Architecture alias: \\`${IMAGE}:${GPU_ARCH}\\`
-          - Latest architecture alias: \\`${IMAGE}:latest-${GPU_ARCH}\\`
-          - Immutable digest: \\`${IMAGE}@${DIGEST}\\`
+          - Version: `{image}:{version_tag}`
+          - Architecture alias: `{image}:{arch}`
+          - Latest architecture alias: `{image}:latest-{arch}`
+          - Immutable digest: `{image}@{digest}`
 
           Pull and run from PowerShell:
 
-          \\`\\`\\`powershell
-          .\\scripts\\wsl2-docker.ps1 -Action release -ImageTag ${VERSION_TAG}
-          \\`\\`\\`
+          ```powershell
+          .\\scripts\\wsl2-docker.ps1 -Action release -ImageTag {version_tag}
+          ```
 
           This image is source-linked, Apache-2.0 licensed, and published with
-          BuildKit provenance plus an OCI SBOM. It targets \\`${GPU_ARCH}\\`.
-          EOF
-          } > /tmp/release-notes.md
+          BuildKit provenance plus an OCI SBOM. It targets `{arch}`.
+          """
+          Path("/tmp/release-notes.md").write_text(original + metadata, encoding="utf-8")
+          PY
           gh release edit "$TAG" --repo "$GITHUB_REPOSITORY" --notes-file /tmp/release-notes.md
