@@ -113,3 +113,9 @@ This project is independently developed and is not affiliated with, sponsored
 by, or endorsed by Advanced Micro Devices, Inc., the PyTorch Foundation, The
 Linux Foundation, Preferred Networks, Inc., Preferred Elements, Inc., or the
 authors of Mamba.
+
+## Development assistance
+
+- **ChatGPT (OpenAI)** — assisted with technical discussions and troubleshooting around Radeon/ROCm training, test strategy, and Windows/WSL2 workflows. This acknowledgement does not claim authorship of the toolkit's code or its third-party dependencies.
+
+This is an AI-assistance acknowledgement, not a change to Git commit authorship or an official endorsement by OpenAI.
